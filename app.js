@@ -6,57 +6,174 @@ const path = require("path");
 const fs = require("fs");
 const OUTPUT_DIR = path.resolve(__dirname, "output");
 const outputPath = path.join(OUTPUT_DIR, "team.html");
-​const render = require("./lib/htmlRenderer");
-console.log(new Manager("name", 1, "fakeemail1@fake.com", 214));
-console.log(new Engineer("name", 1, "fakeemail1@fake.com", 214));
-console.log(new Manager("name", 1, "fakeemail1@fake.com", 214));
-​// Write code to use inquirer to gather information about the development team members,
-// and to create objects for each team member (using the correct classes as blueprints!)
-function start(){
-    function createManager() {
-        inquirer.prompt([
-            {
-                type: "input",
-                name: "managerName",
-                message: "What is your manager's name?"
-            },
-            {
-                type: "input",
-                name: "managerId",
-                message: "What is your manager's ID?"
-            },
-            {
-                type: "input",
-                name: "managerOffice",
-                message: "What is your manager's office number?"
-            },
-            {
-                type: "input",
-                name: "managerEmail",
-                message: "What is your manager's email address?"
-            }
-        ]).then(function(data){
-            console.log(data);
-        })
-        
-    }
-    
+const team = [];
+const ID = [];
+const render = require("./lib/htmlRenderer");
+
+
+function createManager() {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "managerName",
+        message: "What is your manager's name?"
+      },
+      {
+        type: "input",
+        name: "managerID",
+        message: "What is your manager's ID?"
+      },
+      {
+        type: "input",
+        name: "managerOffice",
+        message: "What is your manager's office number?"
+      },
+      {
+        type: "input",
+        name: "managerEmail",
+        message: "What is your manager's email address?"
+      }
+    ])
+    .then(function(data) {
+      console.log(data);
+      // name, id, email, officeNumber
+      const manager = new Manager(
+        data.managerName,
+        data.managerID,
+        data.managerEmail,
+        data.managerOffice
+      );
+      team.push(manager);
+      ID.push(data.managerID);
+      buildTeam();
+    });
 }
-​// After the user has input all employees desired, call the `render` function (required
-// above) and pass in an array containing all employee objects; the `render` function will
-// generate and return a block of HTML including templated divs for each employee!
-​// After you have your html, you're now ready to create an HTML file using the HTML
-// returned from the `render` function. Now write it to a file named `team.html` in the
-// `output` folder. You can use the variable `outputPath` above target this location.
-// Hint: you may need to check if the `output` folder exists and create it if it
-// does not.
-​
-// HINT: each employee type (manager, engineer, or intern) has slightly different
-// information; write your code to ask different questions via inquirer depending on
-// employee type.
-​
-// HINT: make sure to build out your classes first! Remember that your Manager, Engineer,
-// and Intern classes should all extend from a class named Employee; see the directions
-// for further information. Be sure to test out each class and verify it generates an 
-// object with the correct structure and methods. This structure will be crucial in order
-// for the provided `render` function to work!```
+
+function buildTeam() {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "teamMember",
+        message: "What type of team member would you like to add?",
+        choices: ["engineer", "intern", "The team is full now!"]
+      }
+    ])
+    .then(function(data) {
+      switch (data.teamMember) {
+        case "engineer":
+          createEngineer();
+          break;
+        case "intern":
+          createIntern();
+          break;
+        default:
+          render(team);
+      }
+    });
+}
+
+function createEngineer() {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "engineerName",
+        message: "What is your engineer's name?"
+      },
+      {
+        type: "input",
+        name: "engineerID",
+        message: "What is your engineer's ID?",
+        validate: answer => {
+          //if something between 1 and 9 is typed then it will be stored as true
+          const pass = answer.match(/^[1-9]\d*$/);
+          if (pass) {
+            return ID.includes(answer)
+              ? "This ID is already being used!!!  Try again!"
+              : true;
+          }
+          return "-Please enter a number greater than Zero-";
+        }
+      },
+      {
+        type: "input",
+        name: "engineerGitHub",
+        message: "What is your engineer's Github profile name?"
+      },
+      {
+        type: "input",
+        name: "engineerEmail",
+        message: "What is your engineer's email address?"
+      }
+    ])
+    .then(function(data) {
+      console.log(data);
+      // name, id, email, officeNumber
+      const engineer = new Engineer(
+        data.engineerName,
+        data.engineerID,
+        data.engineerEmail,
+        data.engineerGitHub
+      );
+      team.push(engineer);
+      ID.push(data.engineerID);
+      buildTeam();
+    });
+}
+
+function createIntern() {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "internName",
+        message: "What is your intern's name?"
+      },
+      {
+        type: "input",
+        name: "internID",
+        message: "What is your intern's ID?",
+        validate: answer => {
+          //if something between 1 and 9 is typed then it will be stored as true
+          const pass = answer.match(/^[1-9]\d*$/);
+          if (pass) {
+            return ID.includes(answer)
+              ? "This ID is already being used!!!  Try again!"
+              : true;
+          }
+          return "-Please enter a number greater than Zero-";
+        }
+      },
+      {
+        type: "input",
+        name: "internSchool",
+        message: "Where did your intern go to school?"
+      },
+      {
+        type: "input",
+        name: "internEmail",
+        message: "What is your intern's email address?"
+      }
+    ])
+    .then(function(data) {
+      console.log(data);
+      // name, id, email, officeNumber
+      const intern = new Intern(
+        data.internName,
+        data.internID,
+        data.internEmail,
+        data.internSchool
+      );
+      team.push(intern);
+      ID.push(data.internID);
+      buildTeam();
+    });
+}
+
+
+function start() {
+  createManager();
+}
+start();
