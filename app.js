@@ -56,8 +56,8 @@ function buildTeam() {
       {
         type: "input",
         name: "teamMember",
-        message: "What type of team member would you like to add?",
-        choices: ["engineer", "intern", "The team is full now!"]
+        message: "What type of team member would you like to add? You can choose engineer, intern, or The team is full.",
+        choices: ["engineer", "intern", "The team is full"]
       }
     ])
     .then(function(data) {
